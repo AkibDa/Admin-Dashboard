@@ -15,7 +15,6 @@ const DashboardLayout = ({ children }) => {
       <Navbar toggleSidebar={toggleSidebar} />
       <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
       
-      {/* Main content */}
       <div className="p-4 lg:ml-64 mt-14">
         <div className="rounded-lg mt-4">
           {children}

@@ -1,12 +1,9 @@
-// src/routes/AppRoutes.jsx
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from '../pages/Login/Login';
 import Dashboard from '../pages/Dashboard/Dashboard';
 import ProtectedRoute from './ProtectedRoute';
-
-// Placeholder pages (we'll build these next)
-const Stalls = () => <div className="p-8"><h1 className="text-3xl font-bold">Stalls Page - Coming Soon</h1></div>;
-const Domains = () => <div className="p-8"><h1 className="text-3xl font-bold">Domains Page - Coming Soon</h1></div>;
+import Stalls from '../pages/Stalls/Stalls';
+import Domains from '../pages/Domains/Domains';
 
 const AppRoutes = () => {
   return (
