@@ -22,40 +22,30 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Login function
   const login = async (email, password) => {
     try {
       setError(null);
       setLoading(true);
 
-      // Step 1: Sign in with Firebase
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // Step 2: Get Firebase ID token
       const token = await user.getIdToken();
 
-      // Step 3: Verify admin role with backend
-      // 🔧 MOCK MODE - Remove this when backend is ready
       const MOCK_MODE = true; // Set to false when FastAPI is ready
       
       if (MOCK_MODE) {
         // Mock admin verification (for testing only)
-        // Only allow emails ending with @tint.edu.in
         const allowedDomain = '@tint.edu.in';
         if (!email.endsWith(allowedDomain)) {
           await signOut(auth);
           throw new Error(`Access denied: Only ${allowedDomain} emails are allowed`);
         }
-        
-        // Mock: Assume user is admin if domain matches
         setIsAdmin(true);
         setCurrentUser(user);
         localStorage.setItem('adminToken', token);
         return { success: true };
       }
-      
-      // Real backend verification (use when FastAPI is ready)
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/verify`, {
         method: 'POST',
         headers: {
@@ -71,15 +61,12 @@ export const AuthProvider = ({ children }) => {
       const data = await response.json();
       
       if (!data.is_admin) {
-        // If not admin, sign them out immediately
         await signOut(auth);
         throw new Error('Access denied: Admin privileges required');
       }
 
       setIsAdmin(true);
       setCurrentUser(user);
-      
-      // Store token for API calls
       localStorage.setItem('adminToken', token);
 
       return { success: true };
@@ -95,8 +82,6 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
     }
   };
-
-  // Logout function
   const logout = async () => {
     try {
       await signOut(auth);
@@ -107,12 +92,9 @@ export const AuthProvider = ({ children }) => {
       console.error('Logout error:', err);
     }
   };
-
-  // Listen to auth state changes
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        // User is signed in, verify admin status
         try {
           const token = await user.getIdToken();
           
