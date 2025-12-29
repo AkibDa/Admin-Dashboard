@@ -1,23 +1,39 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { addStall } from '../../services/stallService';
 import DashboardLayout from './DashboardLayout';
+import { collection, onSnapshot } from 'firebase/firestore';
+import { db } from '../../app/firebase';
 
 const Dashboard = () => {
   const { currentUser } = useAuth();
 
   // Modal States
+  const [stallCount,setStallCount] = useState(0)
   const [showAddModal, setShowAddModal] = useState(false);
   const [formData, setFormData] = useState({ name: '', email: '' });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
+  useEffect(() => {
+    const stallsCollectionRef = collection(db,'colleges','tMEBxMvwxTkfeYU5mXDW','stalls')
+
+    const unsubscribe = onSnapshot(stallsCollectionRef,(snapshot) => {
+      setStallCount(snapshot.size)
+      console.log("Current live stall count:",snapshot.size)
+    },(err) => {
+      console.error("Failed to listen to stall count:",err)
+    })
+
+    return () => unsubscribe();
+  },[])
+
   const stats = [
     {
       title: 'Total Stalls',
-      value: '12',
-      change: '+2 this month',
+      value: stallCount.toString(),
+      change: 'Live tracking',
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
